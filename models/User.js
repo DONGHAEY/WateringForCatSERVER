@@ -1,4 +1,4 @@
-const mongoose = requires("mongoose");
+const mongoose = require("mongoose");
 
 const userSchema = mongoose.Schema({
     name : {
@@ -36,4 +36,4 @@ const userSchema = mongoose.Schema({
 
 const User = mongoose.model('User', userSchema) //User라는 이름으로 모델을 만들고 그 모델안에는 userSchema object를 스키마로 넣어라..
 
-module.exports = {User};
+module.exports = { User };
