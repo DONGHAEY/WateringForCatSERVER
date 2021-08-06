@@ -66,25 +66,21 @@ userSchema.methods.comparePassword = function(plainPassword, cb) { //userSchema�
 userSchema.methods.generateToken = function(cb) {
     //jsonwbtoken을 이용해서 token을 생성하기
     const user = this; //userSchema를 말한다
-    const token = jwt.sign(user.id, 'secretToken');
+    const token = jwt.sign(user._id.toHexString(), 'secretToken');
     user.token = token;
-
     user.save(function(err, user) {
         if(err) return cb(err)
-        else cb(null, user)
+        cb(null, user)
     })
 }
 
-userSchema.methods.findByToken = (token, cb)=> {
+userSchema.statics.findByToken = function (token, cb) {
     const user = this;
-    //token을 여기서 디코드한다
-    jwt.verify(token, 'secretToken', function(err, decoded) {
-        //유저 아이디를 이용해서 유저를 찾은 다음에
+    const ppl = token;
+    jwt.verify (ppl, 'secretToken', (err, decoded)=> {
         user.findOne({ "_id": decoded, "token": token}, (err, user)=> {
-            if (err) return cb(err);
-            cb(null, user);
+            cb(err, user);
         })
-        //클라이언트에서 가져온 token과 db에 보관된 토큰이 일치하는지 확인
     })
 }
 

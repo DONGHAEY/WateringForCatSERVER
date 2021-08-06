@@ -60,43 +60,55 @@ app.post ("/api/users/login", (req, res) => {
         user.comparePassword(pass, (err, isMatch)=> { //그 유저 데이터베이스에 대하여.함수를 실행하라(비밀번호보내고, 콜백함수 보낸다)
             if(!isMatch) return res.json ({ loginSuccess: false, message: "비밀번호가 틀렸습니다."}) //콜백함수에서 isMatch가 들어오지 않으면 이걸 실행해라
             console.log("success");
-            user.generateToken((err, user) => {
+
+            user.generateToken(function(err, usr) {
                 if(err) return res.status(400).send(err);
                 //토큰을 저장한다. (쿠키 or 로컬)
-                res.cookie('x_auth', user.token)
+                res.cookie("x_auth", usr.token)
                 .status(200)
-                .json({ loginSuccess : true, userId:user._id})
+                .json({ loginSuccess : true, userId:usr._id})
             })
         })
     })
 })
 
 
-app.get ('/api/users/auth', auth, (req, res) => {
+app.get ('/api/users/auth', (req, res) => {
     //여기까지 미들웨어를 통과해 왔다는 이야기는 Authentication이 True라는 말
-    res.status(200).json({
-         _id: req.user._id, 
-         isAdmin: req.user.role === 0 ? false : true, 
-         isAuth: true, 
-         email: req.user.name,
-         name: req.user.name,
-         lastname: req.user.last.name,
-         role: req.user.role,
-         image: req.user.image
+    const r =req.cookies;
+    const token = r.x_auth;
+    auth(token, (err, user)=> {
+        if (err) res.status(400).json({ isAuth:false, err });
+        else if (!user) res.json({ isAuth:false });
+        else {
+            res.status(200).json({
+                _id: user._id,
+                isAdmin: user.role === 0 ? false : true, 
+                isAuth: true, 
+                email: user.email,
+                name: user.name,
+                lastname: user.lastname,
+                role: user.role,
+                image: user.image
+           })
+        }
     })
 })
 
-app.get ('/goo', (req, res) => {
-    console.log(req.cookies);
-})
-
-app.get ('api/users/logout', auth, (req, res) => {
-    User.findOneAndUpdate({ _id: req.user._id }), { token:"" }, (err, user) => {
-        if(err) return res.json({ success:false, err })
-        return res.status(200).send({
-            success:true
+app.get ('/logout', (req, res) => {
+    const r = req.cookies;
+    const key = r.x_auth;
+    auth (key, (err, user)=> {
+        if (err) return res.send({ succes:false });
+        if (!user) return res.send({ success:false });
+        console.log("여기까지나 했네..")
+        User.findOneAndUpdate({_id:user._id }, { token:""}, (err, user)=> {
+            if(err) return res.json ({ success:false });
+            return res.status(200).send({
+                success:true
+            })
         })
-    }
+    });
 })
 
 app.listen(port, () => console.log(`started on ${port}!`)); //app.listen을 사용하여 서버를 실행시킨다, 그리고 몇번 포트에서 열렸는지 알려주는 함수를 실행한다.
