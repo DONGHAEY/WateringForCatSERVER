@@ -3,7 +3,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const saltRounds = 10;
 
-const userSchema = mongoose.Schema({
+const userSchema = new mongoose.Schema({
     name : {
         type:String,
         maxlength: 50
@@ -77,13 +77,46 @@ userSchema.methods.generateToken = function(cb) {
 userSchema.statics.findByToken = function (token, cb) {
     const user = this;
     const ppl = token;
-    jwt.verify (ppl, 'secretToken', (err, decoded)=> {
+    jwt.verify (ppl, 'secretToken', (err, decoded) => {
         user.findOne({ "_id": decoded, "token": token}, (err, user)=> {
             cb(err, user);
         })
     })
 }
 
+userSchema.statics.find = function(key, cb) {
+    jwt.verify (key, 'secretToken', (err, decoded) => {
+        cb(decoded);
+    })
+}
+
+const machineSchema = new mongoose.Schema ({
+    mi : {
+        type:String
+    },
+    wh : {
+        type:Number
+    },
+    wc : {
+        type:Number
+    },
+    ws : {
+        type:Number,
+        default : 0
+    },
+    ui : {
+        type:String
+    },
+    dat : {
+        type: Array
+    },
+    second : {
+        type: Array,
+        default:0
+    } 
+})
+const Machine = mongoose.model('machine', machineSchema);
+
 const User = mongoose.model('User', userSchema) //User라는 이름으로 모델(콜렉션들)을 만들고 그 모델안에는 userSchema object를 스키마로 넣어라..
 
-module.exports = { User }; // 내보낸다.
+module.exports = { User, Machine }; // 내보낸다.

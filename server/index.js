@@ -1,12 +1,13 @@
 //안녕하세요 제가 auth기능을 추가하였는데, cookie가 안불러와집니다 조금만 도움 요청드립니다.
 
 const express =require("express"); //express모듈을 불러온다
-const app = express(); //app에다가 express를 사용할 수 있도록 해준다
-const port = 3000; //port를 설정한다
+const app = express(); //app에다가 express를 사용할 수 있도록 해준다 
+const port = 5000; //port를 설정한다
 
-const { User } = require("./models/User"); //User.js에서 내보내는 User모델을 불러온다.
 
 const mongoose = require("mongoose"); //몽고DB를 사용하기 위해 몽구스 모듈을 불러왔다..
+
+const { User, Machine } = require("./models/User"); //User.js에서 내보내는 User모델을 불러온다.
 
 const cookieParser = require("cookie-parser");
 
@@ -27,6 +28,7 @@ mongoose.connect(keyValue, {
 app.get ("/", (req, res) => { //'/'로 접속하면 helloworld를 respond하라
     res.send("Hello World!");
 });
+
 
 app.post('/api/users/posts', (req, res) => {
     const HwData = req.body;
@@ -95,7 +97,7 @@ app.get ('/api/users/auth', (req, res) => {
     })
 })
 
-app.get ('/logout', (req, res) => {
+app.get ('/api/users/logout', (req, res) => {
     const r = req.cookies;
     const key = r.x_auth;
     auth (key, (err, user)=> {
@@ -110,5 +112,66 @@ app.get ('/logout', (req, res) => {
         })
     });
 })
+
+
+app.post('/posts', (req, res) => {
+    Machine.findOne({mi:req.body.mi}, (err, machine) => {
+        if(!err) {
+            // let today = new Date().toLocaleDateString();
+            let today = '2021. 8. 16.';
+            const dat = machine.dat;
+            const second = machine.second;
+            const dateArray = dat.pull(); //날짜 배열을 불러온다
+            const lastdate = dateArray[dateArray.length-1]; //배열에서 마지막 부분을 lastdate에 저장
+            if (lastdate !== today) { //만약 마지막에 저장된 날짜가 오늘과 같지 않니?
+                dat.push(today); //그러면 새로 인덱스를 만들고 그곳에 오늘 날짜를 저장해~
+                second.push(req.body.ws); //그리고 iot에서 불러온 값도 새 인덱스에 저장해~
+            } else { //오늘과 같으면..
+                const lastsecond = second.pop() //초 마지막 값을 불러온다
+                const location = dateArray.indexOf(today);
+                const sec = req.body.ws + lastsecond
+                second.set(location, sec)
+                machine.wh = req.body.wh;
+                machine.wc = req.body.wc;
+                machine.ws = req.body.ws;
+            }
+            machine.save(err => {
+                if(err) return res.json({Success:false});
+                res.json({Success:true});
+            }) 
+        }
+    })
+})
+
+app.post('/api/make', (req, res) => {
+    const achine = new Machine(req.body);
+    const key = req.cookies.x_auth;
+    User.find(key, (ui_)=> {
+        achine.ui = ui_
+        achine.dat.push("start");
+        achine.second.push();
+        achine.save(err => {
+            if(err) return res.json({Success:false})
+            return res.json({Success:true})
+        })
+    });
+})
+
+app.get('/api/hhc', (req, res)=> {
+    const r = req.cookies;
+    const key = r.x_auth;
+    const id = User.find(key, (ui_)=> {
+        Machine.findOne({ui:ui_}, (err, machine) => {
+            if(err);
+            if(!machine) return res.status(400)
+            res.status(200).json({
+                wh: machine.wh,
+                wc: machine.wc,
+                ws: machine.ws
+            })
+        })
+    })
+})
+
 
 app.listen(port, () => console.log(`started on ${port}!`)); //app.listen을 사용하여 서버를 실행시킨다, 그리고 몇번 포트에서 열렸는지 알려주는 함수를 실행한다.
