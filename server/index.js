@@ -98,6 +98,7 @@ app.get ('/api/users/auth', (req, res) => {
 })
 
 app.get ('/api/users/logout', (req, res) => {
+    console.log("dsf")
     const r = req.cookies;
     const key = r.x_auth;
     auth (key, (err, user)=> {
@@ -113,12 +114,42 @@ app.get ('/api/users/logout', (req, res) => {
     });
 })
 
+app.post ('/api/chart', (req, res)=> {
+    console.log("dsf")
+    const key = req.cookies.x_auth;
+    User.find(key, (ui_)=> {
+        Machine.findOne({ui:ui_}, (err, machine) => {
+            if(err);
+            if(!machine) return res.status(400)
+            const dbDate = machine.dat;
+            const dbSecond = machine.second;
+            let dbDate_l = dbDate.length-1
+            // console.log(dbDate_l); 4이 나온다.
+            // let p = 6;
+            // let arrDate = ['none', 'none', 'none', 'none', 'none', 'none', 'none'];
+            // let arrSecond = [0, 0, 0, 0, 0, 0, 0];
+            // for(let i=dbDate_l; i>dbDate_l-7; i--) {
+            //     if (dbDate[i] !== 'start') {
+            //         arrDate[p] = dbDate[i];
+            //         arrSecond[p] = dbSecond[i];
+            //         p--;
+            //     } else {
+            //         break;
+            //     }
+            // }
+            res.json({
+                date:dbDate,
+                second:dbSecond
+            })
+        })
+    })
+})
+
 
 app.post('/posts', (req, res) => {
     Machine.findOne({mi:req.body.mi}, (err, machine) => {
         if(!err) {
-            // let today = new Date().toLocaleDateString();
-            let today = '2021. 8. 16.';
+            let today = new Date().toLocaleDateString();
             const dat = machine.dat;
             const second = machine.second;
             const dateArray = dat.pull(); //날짜 배열을 불러온다
@@ -133,7 +164,6 @@ app.post('/posts', (req, res) => {
                 second.set(location, sec)
                 machine.wh = req.body.wh;
                 machine.wc = req.body.wc;
-                machine.ws = req.body.ws;
             }
             machine.save(err => {
                 if(err) return res.json({Success:false});
@@ -167,7 +197,7 @@ app.get('/api/hhc', (req, res)=> {
             res.status(200).json({
                 wh: machine.wh,
                 wc: machine.wc,
-                ws: machine.ws
+                ws: machine.second.pop()
             })
         })
     })

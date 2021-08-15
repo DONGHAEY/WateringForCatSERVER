@@ -27,7 +27,8 @@ export function auth() {
 }
 
 export function import_w() {
-    const request = axios.get('api/hhc').then(response => response.data)
+    console.log("aa")
+    const request = axios.get('/api/hhc').then(response => response.data)
     return {
         type: 'IMPORT_WATER_VALUE',
         payload: request

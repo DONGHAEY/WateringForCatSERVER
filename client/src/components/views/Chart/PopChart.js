@@ -1,39 +1,67 @@
+import axios from "axios";
 import React, { Component } from "react";
 import Chart from "react-apexcharts";
 
-class Char extends Component {
+class App extends Component {
   constructor(props) {
     super(props);
-
     this.state = {
       options: {
         chart: {
           id: "basic-bar"
         },
         xaxis: {
-          categories: [1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998]
+          categories: ['ready', '...', '...', '...', '...', '...', '...', '...']
         }
       },
       series: [
         {
           name: "series-1",
-          data: [30, 40, 45, 50, 49, 60, 70, 91]
+          data: ['...', '...', '...', '...', '...', '...', '...', '...']
         }
       ]
     };
   }
+  
+  async componentDidMount () {
+      const second=[], date =[]
+      await axios.post("/api/chart")
+      .then(response => {
+          for(let i=0; i<4; i++) {
+            second.push(response.data.second[i]);
+            date.push(response.data.date[i]);
+          }
+          this.setState({
+            options: {
+              chart: {
+                id: "d-bar"
+              },
+              xaxis: {
+                categories: date
+              }
+            },
+            series: [
+              {
+                name: "series-1",
+                data: second
+              }
+            ]
+          })
+      }
+
+    )}
 
   render() {
     return (
       <div className="app">
         <div className="row">
           <div className="mixed-chart">
-          <Chart
-            options={this.state.options}
-            series={this.state.series}
-            type="line"
-            width="500"
-        />
+            <Chart
+              options={this.state.options}
+              series={this.state.series}
+              type="line"
+              width="500"
+            />
           </div>
         </div>
       </div>
@@ -41,4 +69,4 @@ class Char extends Component {
   }
 }
 
-export default Char;
+export default App;

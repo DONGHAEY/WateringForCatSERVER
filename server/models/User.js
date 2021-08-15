@@ -98,7 +98,7 @@ const machineSchema = new mongoose.Schema ({
         type:Number
     },
     wc : {
-        type:Number
+        type:String
     },
     ws : {
         type:Number,

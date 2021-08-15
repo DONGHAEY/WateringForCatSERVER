@@ -5,7 +5,7 @@ import LoginPage from './components/views/LoginPage/LoginPage'
 import RegisterPage from './components/views/RegisterPage/RegisterPage'
 import MachinePage from './components/views/Machine/Machine'
 import MakePage from './components/views/Make/make'
-import Char from './components/views/Chart/PopChart';
+import MyComponent from './components/views/Chart/PopChart';
 import Auth from './Hoc/auth'
 
 import {
@@ -17,7 +17,6 @@ import {
 function App() {
   return (
         <Router>
-          <Navbar />
           <div>
 
             {/*
@@ -27,13 +26,14 @@ function App() {
               you have multiple routes, but you want only one
               of them to render at a time
             */}
+            <Navbar />
             <Switch>
               <Route exact path="/" component={Auth(LandingPage, null)} /> {/*null 누구한테나 다보여라, true 로그인한 사람한테 보여라, false 로그인 안한사람한테 보여라*/}
               <Route exact path="/login" component={Auth(LoginPage, false)} />
               <Route exact path="/register" component={Auth(RegisterPage, false)} />
               <Route exact path="/machine" component={MachinePage} />
               <Route exact path="/make" component={MakePage} />
-              <Route exact path="/chart" component={Char}  />
+              <Route exact path="/chart" component={MyComponent}  />
             </Switch>
           </div>
         </Router>

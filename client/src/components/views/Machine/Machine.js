@@ -8,17 +8,20 @@ function Machine(props) {
   const [count, setCount] = useState(0);
   const [water_height, setwater_height] = useState('')
   const [water_quality, setwater_quality] = useState('')
-
   const dispatch = useDispatch()
 
   useEffect(() => {
-  dispatch(import_w()).then(response => {
-      setCount(response.payload.ws)
-      setwater_height(response.payload.wh)
-      setwater_quality(response.payload.wc)
-    })
+
+      dispatch(import_w()).then(response => {
+        setCount(response.payload.ws)
+        setwater_height(response.payload.wh)
+        setwater_quality(response.payload.wc)
+      })
   })
-  const rerender = function() {
+  const click = (event)=> {
+    props.history.push('/chart')
+  }
+  const represh = (event)=> {
     props.history.push('/machine')
   }
 
@@ -33,7 +36,7 @@ function Machine(props) {
       <p style={{fontSize:'18px'}}>물 높이 : {water_height}, 수질상태 : {water_quality}</p>
       <h2 style={{fontSize:'35px', marginTop:"-15px"}}>오늘 고양이가</h2>
       <h2 style={{fontSize:'35px', marginTop:"-20px"}}>물을 {count}초 동안 마셨어요</h2>
-      <button>통계확인</button>       <button Onclick={rerender}>새로고침</button>
+      <button onClick={click}>통계확인</button>       <button onClick={represh}>새로고침</button>
     </div>
   )
 }
