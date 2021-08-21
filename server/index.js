@@ -26,7 +26,7 @@ mongoose.connect(keyValue, {
 .catch (err => console.log(err));
 
 app.get ("/", (req, res) => { //'/'로 접속하면 helloworld를 respond하라
-    res.send("Hello World!");
+    console.log(req.body.email)
 });
 
 

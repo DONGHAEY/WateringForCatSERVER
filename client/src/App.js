@@ -18,7 +18,7 @@ function App() {
   return (
         <Router>
           <div>
-
+          <Navbar />
             {/*
               A <Switch> looks through all its children <Route>
               elements and renders the first one whose path
@@ -26,7 +26,6 @@ function App() {
               you have multiple routes, but you want only one
               of them to render at a time
             */}
-            <Navbar />
             <Switch>
               <Route exact path="/" component={Auth(LandingPage, null)} /> {/*null 누구한테나 다보여라, true 로그인한 사람한테 보여라, false 로그인 안한사람한테 보여라*/}
               <Route exact path="/login" component={Auth(LoginPage, false)} />

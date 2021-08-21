@@ -27,7 +27,7 @@ class App extends Component {
       const second=[], date =[]
       await axios.post("/api/chart")
       .then(response => {
-          for(let i=0; i<4; i++) {
+          for(let i=0; i<(response.data.second).length; i++) {
             second.push(response.data.second[i]);
             date.push(response.data.date[i]);
           }
@@ -60,7 +60,7 @@ class App extends Component {
               options={this.state.options}
               series={this.state.series}
               type="line"
-              width="500"
+              width="400"
             />
           </div>
         </div>

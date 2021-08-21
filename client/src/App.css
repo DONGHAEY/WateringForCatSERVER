@@ -1,7 +1,3 @@
-
-.container {
-  margin: 70px auto;
-  overflow: hidden;
-  width:80%;
-  text-align: center;
+body {
+  background-color: red;
 }

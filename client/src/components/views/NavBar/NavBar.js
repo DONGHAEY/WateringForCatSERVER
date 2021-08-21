@@ -17,7 +17,7 @@ function Navbar() {
           <Link to="#" className="menu-bars">
             <BsIcons.BsFilterRight onClick={showSidebar} />
           </Link>
-          <Link to="#" className="Logo">
+          <Link to="/" className="Logo">
             REUN
           </Link>
         </div>
